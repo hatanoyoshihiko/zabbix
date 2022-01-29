@@ -6,7 +6,7 @@
 # http_proxy: "http://proxy.jp:8080"
 # https_proxy: "http://proxy.jp:8080"
 
-- name: Zabbix server deploy
+- name: Deploy zabbix server
   hosts: zabbix_server
   become: true
   roles:
