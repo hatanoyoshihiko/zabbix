@@ -1,0 +1,10 @@
+- name: Install Database Server
+  dnf:
+    name: "{{ database_packages }}"
+  vars:
+    database_packages:
+    - mariadb
+    - mariadb-server
+    - mariadb-common
+    - python3-PyMySQL 
+    state: latest
