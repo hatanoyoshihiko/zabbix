@@ -1,0 +1,8 @@
+---
+mariadb:
+  root: root
+  root_password: root
+  user: zabbix
+  user_password: zabbix
+  db_name: zabbix
+  script: create.sql
