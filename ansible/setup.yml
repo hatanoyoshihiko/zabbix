@@ -7,11 +7,16 @@
 # https_proxy: "http://proxy.jp:8080"
 
 - name: Deploy zabbix server
-  hosts: zabbix_server
+  hosts: maria_db
   become: true
   roles:
     - { role: common, tags: common }
     - { role: mariadb, tags: mariadb }
+
+- name: Deploy zabbix server
+  hosts: zabbix_server
+  become: true
+  roles:
     - { role: zabbix, tags: zabbix }
 
       #  post_tasks:

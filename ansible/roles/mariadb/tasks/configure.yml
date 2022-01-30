@@ -14,73 +14,75 @@
     timeout: 30
     state: started
 
-- name: Set root user password
-  command: mysqladmin -u root password "{{ mariadb.root_password}}"
-  args:
-    creates: "/var/lib/mysql/.changed_root_pass.lck"
-  register: changed_root_pass
+- block:
+    - name: Set root user password
+      command: mysqladmin -u root password "{{ mariadb.root_password}}"
+      args:
+        creates: "/var/lib/mysql/.changed_root_pass.lck"
+      register: changed_root_pass
 
-- name: Setup flag file
-  file:
-    path: /var/lib/mysql/.changed_root_pass.lck
-    state: touch
-    mode: '0400'
-  when: changed_root_pass.changed
+    - name: Setup flag file
+      file:
+        path: /var/lib/mysql/.changed_root_pass.lck
+        state: touch
+        mode: "0400"
+      when: changed_root_pass.changed
 
-- name: Delete anonymous user
-  no_log: true
-  mysql_user:
-    login_user: "{{ mariadb.root }}"
-    login_password: "{{ mariadb.root_password }}"
-    name: ""
-    host_all: yes
-    state: absent
+    - name: Delete anonymous user
+      no_log: true
+      mysql_user:
+        login_user: "{{ mariadb.root }}"
+        login_password: "{{ mariadb.root_password }}"
+        name: ""
+        host_all: yes
+        state: absent
 
-- name: Create database
-  mysql_db:
-    login_user: "{{ mariadb.root }}"
-    login_password: "{{ mariadb.root_password }}"
-    name: "{{ mariadb.db_name }}"
-    state: present
-    encoding: utf8
-    #encoding: utf8mb4
+    - name: Create database
+      mysql_db:
+        login_user: "{{ mariadb.root }}"
+        login_password: "{{ mariadb.root_password }}"
+        name: "{{ mariadb.db_name }}"
+        state: present
+        encoding: utf8
+        #encoding: utf8mb4
 
-- name: Create zabbix user
-  no_log: true
-  mysql_user:
-    login_user: "{{ mariadb.root }}"
-    login_password: "{{ mariadb.root_password }}"
-    name: "{{ mariadb.user}}"
-    password: "{{ mariadb.user_password }}"
-    priv: "{{ mariadb.user }}.*:ALL"
-    state: present
+    - name: Create zabbix user
+      no_log: true
+      mysql_user:
+        login_user: "{{ mariadb.root }}"
+        login_password: "{{ mariadb.root_password }}"
+        name: "{{ mariadb.user}}"
+        password: "{{ mariadb.user_password }}"
+        priv: "{{ mariadb.user }}.*:ALL"
+        state: present
 
-- name: Check zabbix table existence
-  shell:
-    mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables' | wc -l
-  register: zabbix_table_count
+    - name: Check zabbix table existence
+      shell: mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables' | wc -l
+      register: zabbix_table_count
 
-- name: Import initial schema and data
-  shell:
-    zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
-  when: zabbix_table_count.stdout == 0
-  #debugger: always
+    - name: Import initial schema and data
+      shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
+      when: zabbix_table_count.stdout == 0
+      #debugger: always
 
-- name: Set DB config file mariadb-server.cnf
-  template:
-    src: mariadb-server.cnf.j2
-    dest: /etc/my.cnf.d/mariadb-server.cnf
-    owner: root
-    group: root
-    mode: "0644"
+    - name: Set DB config file mariadb-server.cnf
+      template:
+        src: mariadb-server.cnf.j2
+        dest: /etc/my.cnf.d/mariadb-server.cnf
+        owner: root
+        group: root
+        mode: "0644"
 
-- name: Set DB config file clients.cnf
-  template:
-    src: clients.cnf.j2
-    dest: /etc/my.cnf.d/clients.cnf
-    owner: root
-    group: root
-    mode: "0644"
+    - name: Set DB config file clients.cnf
+      template:
+        src: clients.cnf.j2
+        dest: /etc/my.cnf.d/clients.cnf
+        owner: root
+        group: root
+        mode: "0644"
+
+  run_once: true
+  delegate_to: "{{ hostvars.mariadb01.ansible_host }}"
 
 - name: Restart MariaDB Server
   systemd:
