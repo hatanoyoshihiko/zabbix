@@ -10,6 +10,7 @@
   hosts: zabbix_server
   become: true
   roles:
+    - { role: common, tags: common }
     - { role: mariadb, tags: mariadb }
     - { role: zabbix, tags: zabbix }
 
