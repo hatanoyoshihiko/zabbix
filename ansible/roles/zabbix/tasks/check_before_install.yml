@@ -28,7 +28,7 @@
     limit_item: nofile
     value: "65536"
 
-## Optimize Network Kernel Parameters settings
+# Network Kernel Parameters settings
 - name: Network Kernel Parameters settings
   sysctl:
     name: "{{ item.name }}"
