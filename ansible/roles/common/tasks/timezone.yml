@@ -1,0 +1,34 @@
+---
+# Time settings
+- name: configure / timezone
+  timezone:
+    name: Asia/Tokyo
+
+- name: install / chronyd
+  dnf:
+    name: chrony
+    state: latest
+    update_cache: yes
+
+- name: configure / set chrony.conf
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure / restart chronyd
+  systemd:
+    name: chronyd
+    state: restarted
+    enabled: yes
+
+# Sync time service
+- name: configure / system time
+  command: chronyc sources
+  register: time_sync_result
+  ignore_errors: yes
+
+- debug:
+    msg: "{{ time_sync_result.stdout }}"

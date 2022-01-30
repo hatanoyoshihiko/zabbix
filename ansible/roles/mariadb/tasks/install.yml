@@ -1,10 +1,11 @@
 - name: Install Database Server
   dnf:
     name: "{{ database_packages }}"
+    update_cache: yes
+    state: latest
   vars:
     database_packages:
-    - mariadb
-    - mariadb-server
-    - mariadb-common
-    - python3-PyMySQL 
-    state: latest
+      - mariadb
+      - mariadb-server
+      - mariadb-common
+      - python3-PyMySQL
