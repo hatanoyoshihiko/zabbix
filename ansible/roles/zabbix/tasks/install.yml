@@ -12,10 +12,11 @@
 - name: Install zabbix server, frontend, agent
   dnf:
     name: "{{ zabbix_packages }}"
+    update_cache: yes
+    state: latest
   vars:
     zabbix_packages:
-    - zabbix-server-mysql
-    - zabbix-web-mysql
-    - zabbix-apache-conf
-    - zabbix-agent
-    state: latest
+      - zabbix-server-mysql
+      - zabbix-web-mysql
+      - zabbix-apache-conf
+      - zabbix-agent
