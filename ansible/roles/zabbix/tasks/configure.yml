@@ -1,12 +1,20 @@
 ---
-# Configure zabbix server setting 
+# Configure zabbix server setting
+- name: Change timezone for php.ini
+  lineinfile:
+    path: /etc/php-fpm.d/zabbix.conf
+    regex: "^php_value[date.timezone] = Asia/Tokyo"
+    insertafter: "^; php_value[date.timezone] = Europe/Riga"
+    line: "php_value[date.timezone] = Asia/Tokyo"
+    firstmatch: true
+
 - name: Set Zabbix Server config file
   template:
     src: zabbix_server.conf.j2
     dest: /etc/zabbix/zabbix_server.conf
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
 
 - name: Restart service
   systemd:
