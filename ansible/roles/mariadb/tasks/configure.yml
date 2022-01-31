@@ -80,7 +80,6 @@
         owner: root
         group: root
         mode: "0644"
-
   run_once: true
   delegate_to: "{{ hostvars.mariadb01.ansible_host }}"
 
