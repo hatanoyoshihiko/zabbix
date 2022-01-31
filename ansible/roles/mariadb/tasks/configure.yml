@@ -1,9 +1,53 @@
 ---
 # Create initial database, user, import schema and data
+- block:
+    - name: Set DB config file mariadb-server.cnf
+      template:
+        src: mariadb-server.cnf.j2
+        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+        force: yes
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Set DB config file clients.cnf
+      template:
+        src: clients.cnf.j2
+        dest: /etc/mysql/mariadb.conf.d/50-clients.cnf
+        force: yes
+        owner: root
+        group: root
+        mode: "0644"
+  when:
+    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
+    - ansible_distribution_major_version == "8"
+
+- block:
+    - name: Set DB config file mariadb-server.cnf
+      template:
+        src: mariadb-server.cnf.ubuntu.j2
+        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+        force: yes
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Set DB config file client.cnf
+      template:
+        src: clients.cnf.j2
+        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
+        force: yes
+        owner: root
+        group: root
+        mode: "0644"
+  when:
+    - ansible_distribution in ["Ubuntu"]
+    - ansible_distribution_version | float >= 20.04
+
 - name: Start MariaDB Server
   systemd:
     name: mariadb.service
-    state: started
+    state: restarted
     enabled: yes
 
 - name: Wait for MariaDB Server Service
@@ -57,29 +101,17 @@
         state: present
 
     - name: Check zabbix table existence
-      shell: mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables' | wc -l
+      shell: mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
       register: zabbix_table_count
+
+    - name: debug
+      debug:
+        msg: "{{ zabbix_table_count }}"
 
     - name: Import initial schema and data
       shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
-      when: zabbix_table_count.stdout == 0
+      when: zabbix_table_count.stdout == "0"
       #debugger: always
-
-    - name: Set DB config file mariadb-server.cnf
-      template:
-        src: mariadb-server.cnf.j2
-        dest: /etc/my.cnf.d/mariadb-server.cnf
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Set DB config file clients.cnf
-      template:
-        src: clients.cnf.j2
-        dest: /etc/my.cnf.d/clients.cnf
-        owner: root
-        group: root
-        mode: "0644"
   run_once: true
   delegate_to: "{{ hostvars.mariadb01.ansible_host }}"
 

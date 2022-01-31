@@ -9,3 +9,21 @@
       - mariadb-server
       - mariadb-common
       - python3-PyMySQL
+  when:
+    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
+    - ansible_distribution_major_version == "8"
+
+- name: Install Database Server
+  apt:
+    name: "{{ database_packages }}"
+    update_cache: yes
+    state: latest
+  vars:
+    database_packages:
+      - mariadb-server
+      - mariadb-client
+      - mariadb-common
+      - python3-pymysql
+  when:
+    - ansible_distribution in ["Ubuntu"]
+    - ansible_distribution_version | float >= 20.04

@@ -24,7 +24,7 @@
         - net.ipv6.conf.all.disable_ipv6
         - net.ipv6.conf.default.disable_ipv6
 
-    - name: configure / update dnf packages
+    - name: configure / update all packages
       dnf:
         name: "*"
         state: latest
@@ -44,13 +44,13 @@
       systemd:
         name: apparmor
         state: stopped
-        enable: no
+        enabled: no
 
     - name: configure / disable firewall
       systemd:
         name: ufw
         state: stopped
-        enable: no
+        enabled: no
 
     - name: configure / Disable ipv6 interface
       sysctl:
@@ -63,18 +63,31 @@
       loop:
         - net.ipv6.conf.all.disable_ipv6
         - net.ipv6.conf.default.disable_ipv6
-        -
-    - name: configure / update dnf packages
+
+    - name: configure / update all packages
       apt:
         name: "*"
         state: latest
         update_cache: yes
 
-    - name: configure / import EPEL Repository
-      apt:
-        name: epel-release
-        state: latest
-        update_cache: yes
+    # - name: configure / import EPEL Repository
+    #   apt:
+    #     name: epel-release
+    #     state: latest
+    #     update_cache: yes
   when:
     - ansible_distribution in ["Ubuntu"]
-    - ansible_distribution_major_version == 20.04.3"
+    - ansible_distribution_version | float >= 20.04
+
+- name: Restart target nodes
+  reboot:
+    reboot_timeout: 300
+
+- name: Waiting for servers to come back
+  local_action:
+    module: wait_for
+    host: "{{ ansible_host }}"
+    port: 22
+    state: started
+    delay: 10
+    timeout: 120
