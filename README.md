@@ -4,7 +4,7 @@
 
 - zabbix server: 5.0 or more
 - zabbix agent: 5.0 or more
-- Base OS: Ubuntu 20.04.3 LTS (Focal Fossa)
+- Base OS: Ubuntu 20.04.3 LTS (Focal Fossa), RHEL compatibility OS 8.0 or more
 
 ## Deploy zabbix server using ansible
 
