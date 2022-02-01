@@ -4,7 +4,7 @@
 
 `# cd /etc/ansible`
 `# git clone https://github.com/hatanoyoshihiko/zabbix.git`
-`# mv zabbix/ansible/* /etc/ansible/`
+`# cd zabbix/ansible`
 
 ## Configure inventory file
 
@@ -13,11 +13,20 @@
 ```ini
 [zabbix_server]
 zabbix01 ansible_host=172.20.55.190
+
+[maria_db]
+mariadb01 ansible_host=172.20.55.190
 ```
 
 ## Run playbook
 
+- syntax check
+
 `# cd /etc/ansible`
+`# ansible-playbook -i inventory/inventory.ini -k --syntax-check`
+
+- run playbook
+
 `# ansible-playbook -i inventory/inventory.ini -k`
 
 ## Initial zabbix setting
