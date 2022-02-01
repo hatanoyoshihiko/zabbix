@@ -115,15 +115,3 @@
       #debugger: always
   run_once: true
   delegate_to: "{{ hostvars.mariadb01.ansible_host }}"
-# - name: Restart MariaDB Server
-#   systemd:
-#     name: mariadb.service
-#     state: restarted
-
-# - name: Wait for MariaDB Server Service
-#   wait_for:
-#     host: "{{ ansible_host }}"
-#     port: 3306
-#     delay: 5
-#     timeout: 30
-#     state: started
