@@ -88,6 +88,7 @@
         name: "{{ mariadb.db_name }}"
         state: present
         encoding: utf8
+        collation: utf8_bin
         #encoding: utf8mb4
 
     - name: Create zabbix user

@@ -23,3 +23,34 @@ zabbix01 ansible_host=172.20.55.190
 ## Initial zabbix setting
 
 Access to zabbix URL to be appered end of playbook.
+
+1. Welcome
+Push Next step.
+
+2. Check of pre-requisites
+Push Next step.
+
+3. Configure DB Connection
+Input like below
+
+- Database type: MySQL
+- Database host: localhost
+- Database port: 0
+- Database name: zabbix
+- User: zabbix
+- Password: zabbix
+
+4. Zabbix server details
+
+- Host: localhost
+- Port: 10051
+- Name: What you want
+
+5. Pre-installation summary
+
+Push Next step
+
+6. Install
+
+If below message shows, you can access to zabbix server.
+"Congratulations! You have successfully installed Zabbix frontend."
