@@ -4,41 +4,13 @@
   timezone:
     name: Asia/Tokyo
 
-- block:
-    - name: install / chronyd
-      dnf:
-        name: chrony
-        state: latest
-        update_cache: yes
-
-    - name: configure / set chrony.conf
-      template:
-        src: chrony.conf.j2
-        dest: /etc/chrony.conf
-        owner: root
-        group: root
-        mode: 0644
-  when:
-    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
-    - ansible_distribution_major_version == "8"
-
-- block:
-    - name: install / chronyd
-      apt:
-        name: chrony
-        state: latest
-        update_cache: yes
-
-    - name: configure / set chrony.conf
-      template:
-        src: chrony.conf.j2
-        dest: /etc/chrony/chrony.conf
-        owner: root
-        group: root
-        mode: 0644
-  when:
-    - ansible_distribution in ["Ubuntu"]
-    - ansible_distribution_version | float >= 20.04
+- name: configure / set chrony.conf
+  template:
+    src: "{{ chrony.conf_src }}"
+    dest: "{{ chrony.conf_dir }}{{ chrony.conf }}"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: configure / restart chronyd
   systemd:
@@ -46,8 +18,7 @@
     state: restarted
     enabled: yes
 
-# Sync time service
-- name: configure / system time
+- name: configure / sync system time
   command: chronyc sources
   register: time_sync_result
   ignore_errors: yes

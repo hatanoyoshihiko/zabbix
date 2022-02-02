@@ -1,56 +1,32 @@
 ---
 # Create initial database, user, import schema and data
-- block:
-    - name: Set DB config file mariadb-server.cnf
-      template:
-        src: mariadb-server.cnf.j2
-        dest: /etc/my.cnf.d/mariadb-server.cnf
-        force: yes
-        owner: root
-        group: root
-        mode: "0644"
+- name: configure / Set DB config file mariadb-server.cnf
+  template:
+    src: "{{ mariadb_conf.conf_server_src }}"
+    dest: "{{ mariadb_conf.conf_dir }}{{ mariadb_conf.conf_server }}"
+    force: yes
+    backup: yes
+    owner: root
+    group: root
+    mode: "0644"
 
-    - name: Set DB config file clients.cnf
-      template:
-        src: clients.cnf.j2
-        dest: /etc/my.cnf.d/client.cnf
-        force: yes
-        owner: root
-        group: root
-        mode: "0644"
-  when:
-    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
-    - ansible_distribution_major_version == "8"
+- name: configure / Set DB config file clients.cnf
+  template:
+    src: "{{ mariadb_conf.conf_client_src }}"
+    dest: "{{ mariadb_conf.conf_dir }}{{ mariadb_conf.conf_client }}"
+    force: yes
+    backup: yes
+    owner: root
+    group: root
+    mode: "0644"
 
-- block:
-    - name: Set DB config file mariadb-server.cnf
-      template:
-        src: mariadb-server.cnf.ubuntu.j2
-        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-        force: yes
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Set DB config file client.cnf
-      template:
-        src: clients.cnf.j2
-        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
-        force: yes
-        owner: root
-        group: root
-        mode: "0644"
-  when:
-    - ansible_distribution in ["Ubuntu"]
-    - ansible_distribution_version | float >= 20.04
-
-- name: Restart MariaDB Server
+- name: configure / Restart MariaDB Server
   systemd:
     name: mariadb.service
     state: restarted
     enabled: yes
 
-- name: Wait for MariaDB Server Service
+- name: configure / Wait for MariaDB Server Service
   wait_for:
     host: "{{ ansible_host }}"
     port: 3306
@@ -59,20 +35,20 @@
     state: started
 
 - block:
-    - name: Set root user password
+    - name: configure / Set root user password
       command: mysqladmin -u "{{ mariadb.root }}" password "{{ mariadb.root_password}}"
       args:
         creates: "/var/lib/mysql/.changed_root_pass.lck"
       register: changed_root_pass
 
-    - name: Setup flag file
+    - name: configure / Setup flag file
       file:
         path: /var/lib/mysql/.changed_root_pass.lck
         state: touch
         mode: "0400"
       when: changed_root_pass.changed
 
-    - name: Set root user password
+    - name: configure / Set root user password
       command: mysqladmin -u"{{ mariadb.root }}" -p"{{ mariadb.root_password}}" flush-privileges
       when: changed_root_pass.changed
 
@@ -85,7 +61,7 @@
         host_all: yes
         state: absent
 
-    - name: Create database
+    - name: configure / Create database
       mysql_db:
         login_user: "{{ mariadb.root }}"
         login_password: "{{ mariadb.root_password }}"
@@ -95,7 +71,7 @@
         collation: utf8_bin
         #encoding: utf8mb4
 
-    - name: Create zabbix user
+    - name: configure / Create zabbix user
       no_log: true
       mysql_user:
         login_user: "{{ mariadb.root }}"
@@ -105,13 +81,12 @@
         priv: "{{ mariadb.user }}.*:ALL"
         state: present
 
-    - name: Check zabbix table existence
+    - name: configure / Check zabbix table existence
       shell: mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
       register: zabbix_table_count
 
-    - name: Import initial schema and data
+    - name: configure / Import initial schema and data
       shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
       when: zabbix_table_count.stdout == "0"
       #debugger: always
   run_once: true
-  delegate_to: "{{ hostvars.mariadb01.ansible_host }}"

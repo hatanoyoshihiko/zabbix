@@ -2,24 +2,11 @@
 # Configure zabbix server setting
 - name: Change timezone for php.ini
   lineinfile:
-    path: /etc/php-fpm.d/zabbix.conf
-    regex: "^php_value[date.timezone] = Europe/Riga"
-    insertafter: "^; php_value[date.timezone] = Europe/Riga"
-    line: "php_value[date.timezone] = Asia/Tokyo"
-    firstmatch: true
-  when:
-    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
-    - ansible_distribution_major_version == "8"
-
-- name: Change timezone for php.ini
-  lineinfile:
-    path: /etc/zabbix/apache.conf
-    regex: "# php_value date.timezone Europe/Riga"
-    insertafter: "# php_value date.timezone Europe/Riga"
-    line: "        php_value date.timezone Asia/Tokyo"
-  when:
-    - ansible_distribution in ["Ubuntu"]
-    - ansible_distribution_version | float >= 20.04
+    path: "{{ php_fpm.conf_dir }}{{ zabbix.conf }}"
+    regex: "{{ php_fpm.regex }}"
+    insertafter: "{{ php_fpm.insertafter }}"
+    line: "{{ php_fpm.line }}"
+    #firstmatch: true
 
 - name: Set Zabbix Server config file
   template:
@@ -34,26 +21,7 @@
     name: "{{ item }}"
     state: restarted
     enabled: yes
-  loop:
-    - zabbix-server
-    - zabbix-agent
-    - httpd
-  when:
-    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
-    - ansible_distribution_major_version == "8"
-
-- name: Restart service
-  systemd:
-    name: "{{ item }}"
-    state: restarted
-    enabled: yes
-  loop:
-    - zabbix-server
-    - zabbix-agent
-    - apache2
-  when:
-    - ansible_distribution in ["Ubuntu"]
-    - ansible_distribution_version | float >= 20.04
+  loop: "{{ zabbix.service }}"
 
 - name: Wait for Zabbix Server Service
   wait_for:
