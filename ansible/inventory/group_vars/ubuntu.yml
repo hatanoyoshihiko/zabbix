@@ -13,10 +13,10 @@ chrony:
 
 php_fpm:
   conf_dir: /etc/zabbix/
-  conf: zabbix.conf
-  regex: # php_value date.timezone Europe/Riga
-  insertafter: # php_value date.timezone Europe/Riga
-  line: php_value date.timezone Asia/Tokyo
+  conf: apache.conf
+  regex: "^¥s.*# php_value date.timezone Europe/Riga"
+  insertafter: "# php_value date.timezone Europe/Riga"
+  line: "        php_value date.timezone Asia/Tokyo"
 
 zabbix:
   service:
