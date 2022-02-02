@@ -1,6 +1,4 @@
 ---
-## fluentd agent deploy
-- import_tasks: check_before_install.yml
+## zabbix server deploy
 - import_tasks: install.yml
 - import_tasks: configure.yml
-...
