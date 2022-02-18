@@ -1,0 +1,92 @@
+---
+# Create initial database, user, import schema and data
+- name: configure / Set DB config file mariadb-server.cnf
+  template:
+    src: "{{ mariadb_conf.conf_server_src }}"
+    dest: "{{ mariadb_conf.conf_dir }}{{ mariadb_conf.conf_server }}"
+    force: yes
+    backup: yes
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: configure / Set DB config file clients.cnf
+  template:
+    src: "{{ mariadb_conf.conf_client_src }}"
+    dest: "{{ mariadb_conf.conf_dir }}{{ mariadb_conf.conf_client }}"
+    force: yes
+    backup: yes
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: configure / Restart MariaDB Server
+  systemd:
+    name: mariadb.service
+    state: restarted
+    enabled: yes
+
+- name: configure / Wait for MariaDB Server Service
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 3306
+    delay: 5
+    timeout: 30
+    state: started
+
+- block:
+    - name: configure / Set root user password
+      command: mysqladmin -u "{{ mariadb.root }}" password "{{ mariadb.root_password}}"
+      args:
+        creates: "/var/lib/mysql/.changed_root_pass.lck"
+      register: changed_root_pass
+
+    - name: configure / Setup flag file
+      file:
+        path: /var/lib/mysql/.changed_root_pass.lck
+        state: touch
+        mode: "0400"
+      when: changed_root_pass.changed
+
+    - name: configure / Set root user password
+      command: mysqladmin -u"{{ mariadb.root }}" -p"{{ mariadb.root_password}}" flush-privileges
+      when: changed_root_pass.changed
+
+    - name: Delete anonymous user
+      no_log: true
+      mysql_user:
+        login_user: "{{ mariadb.root }}"
+        login_password: "{{ mariadb.root_password }}"
+        name: ""
+        host_all: yes
+        state: absent
+
+    - name: configure / Create database
+      mysql_db:
+        login_user: "{{ mariadb.root }}"
+        login_password: "{{ mariadb.root_password }}"
+        name: "{{ mariadb.db_name }}"
+        state: present
+        encoding: utf8
+        collation: utf8_bin
+        #encoding: utf8mb4
+
+    - name: configure / Create zabbix user
+      no_log: true
+      mysql_user:
+        login_user: "{{ mariadb.root }}"
+        login_password: "{{ mariadb.root_password }}"
+        name: "{{ mariadb.user}}"
+        password: "{{ mariadb.user_password }}"
+        priv: "{{ mariadb.user }}.*:ALL"
+        state: present
+
+    - name: configure / Check zabbix table existence
+      shell: mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
+      register: zabbix_table_count
+
+    - name: configure / Import initial schema and data
+      shell: zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
+      when: zabbix_table_count.stdout == "0"
+      #debugger: always
+  run_once: true
