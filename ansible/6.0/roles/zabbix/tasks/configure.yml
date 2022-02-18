@@ -1,0 +1,35 @@
+---
+# Configure zabbix server setting
+- name: configure / change timezone for php.ini
+  lineinfile:
+    path: "{{ php_fpm.conf_dir }}{{ php_fpm.conf }}"
+    regex: "{{ php_fpm.regex }}"
+    insertafter: "{{ php_fpm.insertafter }}"
+    line: "{{ php_fpm.line }}"
+    #firstmatch: true
+
+- name: configure / set Zabbix Server config file
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: configure / Restart service
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop: "{{ zabbix.service }}"
+
+- name: configure / Wait for Zabbix Server Service
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 80
+    delay: 5
+    timeout: 60
+    state: started
+
+- debug:
+    msg: Access to zabbix http://{{ ansible_host }}/zabbix/

@@ -1,0 +1,42 @@
+---
+# vars:
+# ansible_sudo_pass: 'ansible'
+
+# environment:
+# http_proxy: "http://proxy.jp:8080"
+# https_proxy: "http://proxy.jp:8080"
+
+- name: Deploy Common settings
+  hosts: ubuntu,alma
+  become: true
+  order: inventory
+  roles:
+    - { role: common, tags: common }
+
+- name: Deploy MariaDB server
+  hosts: ubuntu,alma
+  become: true
+  order: inventory
+  roles:
+    - { role: mariadb, tags: mariadb }
+
+- name: Deploy Zabbix server
+  hosts: ubuntu,alma
+  order: inventory
+  become: true
+  roles:
+    - { role: zabbix, tags: zabbix }
+
+      #  post_tasks:
+      #    - name: Restart target nodes
+      #      reboot:
+      #        reboot_timeout: 300
+      #
+      #    - name: Waiting for servers to come back
+      #      wait_for:
+      #        host: "{{ inventory_hostname }}"
+      #        port: 22
+      #        state: started
+      #        delay: 30
+      #        timeout: 300
+      #      delegate_to: 127.0.0.1
