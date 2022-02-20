@@ -2,8 +2,8 @@
 
 ## Clone Repository
 
-`# cd /etc/ansible`
-`# git clone https://github.com/hatanoyoshihiko/zabbix.git`
+`# cd /etc/ansible`  
+`# git clone https://github.com/hatanoyoshihiko/zabbix.git`  
 `# cd zabbix/ansible`
 
 ## Configure inventory file
@@ -22,7 +22,7 @@ mariadb01 ansible_host=172.20.55.190
 
 - syntax check
 
-`# cd /etc/ansible`
+`# cd /etc/ansible`  
 `# ansible-playbook -i inventory/inventory.ini -k --syntax-check`
 
 - run playbook
@@ -61,8 +61,8 @@ Push Next step
 
 6. Install
 
-If below message shows, you can access to zabbix server.
-"Congratulations! You have successfully installed Zabbix frontend."
+If below message shows, you can access to zabbix server.  
+`"Congratulations! You have successfully installed Zabbix frontend."`
 
 ## Initial zabbix setting for zabbix 6.0
 
@@ -88,12 +88,12 @@ Input like below
 - Store credentials in: Plain text
 - User: zabbix
 - Password: zabbix
-  
+
 4. Settings
 
 - Zabbix server name: what you want
 - Default time zone: System
-- Default thema: Blue
+- Default theme: Blue
 
 5. Pre-installation summary
 
@@ -101,5 +101,5 @@ Push Next step
 
 6. Install
 
-If below message shows, you can access to zabbix server.
-"Congratulations! You have successfully installed Zabbix frontend."
+If below message shows, you can access to zabbix server.  
+`"Congratulations! You have successfully installed Zabbix frontend."`
