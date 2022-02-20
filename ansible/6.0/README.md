@@ -29,9 +29,9 @@ mariadb01 ansible_host=172.20.55.190
 
 `# ansible-playbook -i inventory/inventory.ini -k`
 
-## Initial zabbix setting
+## Initial zabbix setting for zabbix 5.0
 
-Access to zabbix URL to be appered end of playbook.
+Access to zabbix URL to be appeared end of playbook.
 
 1. Welcome
 Push Next step.
@@ -54,6 +54,46 @@ Input like below
 - Host: localhost
 - Port: 10051
 - Name: What you want
+
+5. Pre-installation summary
+
+Push Next step
+
+6. Install
+
+If below message shows, you can access to zabbix server.
+"Congratulations! You have successfully installed Zabbix frontend."
+
+## Initial zabbix setting for zabbix 6.0
+
+Access to zabbix URL to be appeared end of playbook.
+
+1. Welcome
+
+- Default language
+chose your language and push Next step.
+
+2. Check of pre-requisites
+
+Push Next step.
+
+3. Configure DB Connection
+
+Input like below
+
+- Database type: MySQL
+- Database host: localhost
+- Database port: 0
+- Database name: zabbix
+- Store credentials in: Plain text
+- User: zabbix
+- Password: zabbix
+  
+4. Settings
+
+- Zabbix server name: what you want
+- Default time zone: System
+- Default thema: Blue
 
 5. Pre-installation summary
 
