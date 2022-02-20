@@ -1,28 +1,42 @@
-- name: Install Database Server
+# - name: Install MariaDB Repository
+#   shell: curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash
+
+# Note: Zabbix 6.0 needs Mariadb 10.5.x to 10.6.x, 10.7.x is not supported 2022.2.20 now.
+- name: Create Mariadb 10.6 Repository
+  template:
+    src: mariadb.repo
+    dest: /etc/yum.repos.d/
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install Database Server for RHEL distribution
   dnf:
     name: "{{ database_packages }}"
     update_cache: yes
+    enablerepo: mariadb-main
     state: latest
   vars:
     database_packages:
-      - mariadb
-      - mariadb-server
-      - mariadb-common
+      - MariaDB-client
+      - MariaDB-server
+      - MariaDB-common
       - python3-PyMySQL
   when:
     - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
     - ansible_distribution_major_version == "8"
 
-- name: Install Database Server
+- name: Install Database Server for Debian distribution
   apt:
     name: "{{ database_packages }}"
     update_cache: yes
+    enablerepo: mariadb-main
     state: latest
   vars:
     database_packages:
-      - mariadb-server
-      - mariadb-client
-      - mariadb-common
+      - MariaDB-client>
+      - MariaDB-server>
+      - MariaDB-common>
       - python3-pymysql
   when:
     - ansible_distribution in ["Ubuntu"]
