@@ -6,9 +6,6 @@
 
 - name: Install MariaDB Repository
   shell: bash /tmp/mariadb_repo_setup --mariadb-server-version=10.6
-  when:
-    - ansible_distribution in ["Ubuntu"]
-    - ansible_distribution_version | float >= 20.04
 
 - name: Install Database Server for RHEL distribution
   dnf:
