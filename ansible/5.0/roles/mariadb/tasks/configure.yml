@@ -48,10 +48,6 @@
         mode: "0400"
       when: changed_root_pass.changed
 
-    - name: configure / Set root user password
-      command: mysqladmin -u"{{ mariadb.root }}" -p"{{ mariadb.root_password}}" flush-privileges
-      when: changed_root_pass.changed
-
     - name: Delete anonymous user
       no_log: true
       mysql_user:
@@ -69,7 +65,6 @@
         state: present
         encoding: utf8
         collation: utf8_bin
-        #encoding: utf8mb4
 
     - name: configure / Create zabbix user
       no_log: true
@@ -81,12 +76,17 @@
         priv: "{{ mariadb.user }}.*:ALL"
         state: present
 
+    - name: configure / Reload privilges for zabbix user
+      shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;' | wc -l
+      register: zabbix_table_count
+
     - name: configure / Check zabbix table existence
-      shell: mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
+      shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
       register: zabbix_table_count
 
     - name: configure / Import initial schema and data
-      shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" -p"{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
+      shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
       when: zabbix_table_count.stdout == "0"
       #debugger: always
   run_once: true
+  delegate_to: "{{ ansible_host }}"
