@@ -85,7 +85,7 @@
         priv: "{{ mariadb.user }}.*:ALL"
         state: present
 
-    - name: configure / Reload privilges for zabbix user
+    - name: configure / Reload privileges for zabbix user
       shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;' | wc -l
       register: zabbix_table_count
 
