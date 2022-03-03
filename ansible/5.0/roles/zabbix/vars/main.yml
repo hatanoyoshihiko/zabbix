@@ -1,1 +1,9 @@
 ---
+zabbix:
+  service:
+    - zabbix-server
+    - zabbix-agent
+mariadb:
+  user: zabbix
+  user_password: zabbix
+  db_name: zabbix
