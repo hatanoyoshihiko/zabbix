@@ -2,7 +2,7 @@
 
 ## Environment 
 
-```Mermaid
+```mermaid
 sequenceDiagram
     participant ansible server
     Note right of ansible server: 172.20.15.100
