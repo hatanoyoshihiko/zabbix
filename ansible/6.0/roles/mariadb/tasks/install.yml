@@ -20,7 +20,7 @@
       - MariaDB-common
       - python3-PyMySQL
   when:
-    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
+    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat", "Rocky"]
     - ansible_distribution_major_version == "8"
 
 - name: Install Database Server for Debian distribution

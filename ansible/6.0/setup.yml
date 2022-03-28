@@ -7,21 +7,21 @@
 # https_proxy: "http://proxy.jp:8080"
 
 - name: Deploy Common settings
-  hosts: ubuntu,alma
+  hosts: ubuntu,alma,rocky
   become: true
   order: inventory
   roles:
     - { role: common, tags: common }
 
 - name: Deploy MariaDB server
-  hosts: ubuntu,alma
+  hosts: ubuntu,alma,rocky
   become: true
   order: inventory
   roles:
     - { role: mariadb, tags: mariadb }
 
 - name: Deploy Zabbix server
-  hosts: ubuntu,alma
+  hosts: ubuntu,alma,rocky
   order: inventory
   become: true
   roles:

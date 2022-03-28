@@ -18,7 +18,7 @@
           - zabbix-apache-conf
           - zabbix-agent
   when:
-    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat"]
+    - ansible_distribution in ["CentOS", "AlmaLinux", "RedHat", "Rocky"]
     - ansible_distribution_major_version == "8"
 
 - block:
