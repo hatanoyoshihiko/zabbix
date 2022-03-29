@@ -50,11 +50,11 @@ hosts: ubuntu,alma,rocky
 ## Variables
 
 - group variables(group_vars)  
-this variables specifies os distribution common configuration.
+this variables specifies os distribution common configuration.  
 e.g. OS common settings.
 
 - role variables(main.yml)  
-this variables specifies variables by middle ware.
+this variables specifies variables by middle ware.  
 e.g. user name, password, database parameter definition.
 
 
