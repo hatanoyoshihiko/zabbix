@@ -51,9 +51,11 @@ hosts: ubuntu,alma,rocky
 
 - group variables(group_vars)  
 this variables specifies os distribution common configuration.
+e.g. OS common settings.
 
 - role variables(main.yml)  
 this variables specifies variables by middle ware.
+e.g. user name, password, database parameter definition.
 
 
 ```bash
@@ -66,7 +68,7 @@ roles-----|
           |                |-main.yml
           |-mariadb-|
           |         |-vars-|
-          |         |-main.yml
+          |                |-main.yml
           |-zabbix--|
                     |-vars-|
                            |-main.yml                                                                    
