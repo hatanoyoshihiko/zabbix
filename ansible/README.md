@@ -78,11 +78,11 @@ roles-----|
 
 - syntax check
 
-`# ansible-playbook -i inventory/inventory.ini setup.yml -k --syntax-check`
+`# ansible-playbook -i inventory/inventory.ini setup.yml -u root -k --syntax-check`
 
 - run playbook
 
-`# ansible-playbook -i inventory/inventory.ini setup.yml -k`
+`# ansible-playbook -i inventory/inventory.ini setup.yml -u root -k`
 
 ## Initial zabbix setting for zabbix 5.0
 
