@@ -1,4 +1,6 @@
 ---
+vars_files:
+  - ../../mariadb/vars/main.yml
 zabbix:
   service:
     - zabbix-server
