@@ -1,4 +1,17 @@
 ---
+# Import Initial Database schema
+- name: configure / Import mariadb variables
+  include_vars: ../mariadb/vars/main.yml
+
+- name: configure / Check zabbix table existence
+  shell: mysql "-u{{ mariadb.root_password }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
+  register: zabbix_table_count
+
+- name: configure / Import initial schema and data
+  shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
+  when: zabbix_table_count.stdout == "0"
+  #debugger: always
+
 # Configure zabbix server setting
 - name: configure / change timezone for php.ini
   lineinfile:
