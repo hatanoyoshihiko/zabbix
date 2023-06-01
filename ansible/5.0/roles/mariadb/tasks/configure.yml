@@ -77,15 +77,15 @@
         state: present
 
     - name: configure / Reload privilges for zabbix user
-      shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;'
+      shell: mysql "-u{{ mariadb.root_password }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;'
 
     - name: configure / Check zabbix table existence
-      shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
+      shell: mysql "-u{{ mariadb.root_password }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
       register: zabbix_table_count
 
     - name: configure / Import initial schema and data
       shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
       when: zabbix_table_count.stdout == "0"
       #debugger: always
-  run_once: true
+  run_once: true    
   delegate_to: "{{ ansible_host }}"
