@@ -1,13 +1,15 @@
 ---
 # Import Initial Database schema
+
+- name: configure / Import mariadb variables
+  include_vars: ../mariadb/vars/main.yml
+
 - name: configure / Check zabbix table existence
   shell: mysql "-u{{ mariadb.root }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
-  include_vars: ../mariadb/vars/main.yml
   register: zabbix_table_count
 
 - name: configure / Import initial schema and data
   shell: zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
-  include_vars: ../mariadb/vars/main.yml
   when: zabbix_table_count.stdout == "0"
 
 # Configure zabbix server setting
