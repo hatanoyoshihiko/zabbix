@@ -93,7 +93,7 @@
       register: zabbix_table_count
 
     - name: configure / Import initial schema and data
-      shell: zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
+      shell: zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}"
       when: zabbix_table_count.stdout == "0"
       #debugger: always
 
