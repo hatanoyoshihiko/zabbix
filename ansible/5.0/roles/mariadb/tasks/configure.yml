@@ -77,6 +77,5 @@
         state: present
 
     - name: configure / Reload privilges for zabbix user
-      shell: mysql "-u{{ mariadb.root_password }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;'
-  run_once: true    
+      shell: mysql "-u{{ mariadb.root_password }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;'  
   delegate_to: "{{ ansible_host }}"

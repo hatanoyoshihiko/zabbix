@@ -88,5 +88,4 @@
     - name: configure / Reload privileges for zabbix user
       shell: mysql "-u{{ mariadb.root }}" "-p{{ mariadb.root_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;'
       #debugger: always
-  run_once: true
   delegate_to: "{{ ansible_host }}"
