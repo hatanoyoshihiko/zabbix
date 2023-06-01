@@ -77,8 +77,7 @@
         state: present
 
     - name: configure / Reload privilges for zabbix user
-      shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;' | wc -l
-      register: zabbix_table_count
+      shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'flush privileges;'
 
     - name: configure / Check zabbix table existence
       shell: mysql "-u{{ mariadb.user }}" "-p{{ mariadb.user_password }}" "{{ mariadb.db_name }}" -e 'show tables;' | wc -l
