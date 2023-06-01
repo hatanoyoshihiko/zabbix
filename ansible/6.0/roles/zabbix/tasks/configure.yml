@@ -1,6 +1,5 @@
 ---
 # Import Initial Database schema
-
 - name: configure / Import mariadb variables
   include_vars: ../mariadb/vars/main.yml
 
